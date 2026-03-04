@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stealer Management Panel</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Flag Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icons/6.9.0/css/flag-icons.min.css">
+    
+    <style>
+        :root {
+            --bg-primary: #0A0A0A;
+            --bg-secondary: #1E1E1E;
+            --bg-card: #252525;
+            --text-primary: #E0E0E0;
+            --text-secondary: #B0B0B0;
+            --accent-cyan: #00FFFF;
+            --accent-purple: #BF00FF;
+            --accent-pink: #FF00C8;
+            --success: #00FF88;
+            --warning: #FFAA00;
+            --danger: #FF4444;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header Styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            color: var(--accent-cyan);
+            font-size: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            background: linear-gradient(45deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .language-selector {
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 8px 15px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .language-selector:hover {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+            box-shadow: var(--box-shadow);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+        }
+
+        .stat-title {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+            opacity: 0.3;
+        }
+
+        /* Victim Table */
+        .victims-section {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+        }
+
+        .filter-input {
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 8px 15px;
+            color: var(--text-primary);
+            width: 200px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .victim-id {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .windows-icon {
+            color: var(--accent-cyan);
+        }
+
+        .ip-location {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .os-icon {
+            color: var(--accent-cyan);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-right: 5px;
+            margin-bottom: 3px;
+        }
+
+        .badge-passwords {
+            background: rgba(0, 255, 255, 0.1);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .badge-cookies {
+            background: rgba(191, 0, 255, 0.1);
+            color: var(--accent-purple);
+            border: 1px solid rgba(191, 0, 255, 0.3);
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .social-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .social-icon:hover {
+            transform: scale(1.1);
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+        }
+
+        .last-seen {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .filters {
+                flex-wrap: wrap;
+            }
+            
+            .filter-input {
+                width: 100%;
+            }
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.8rem;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-shield-alt logo-icon"></i>
+                <div>
+                    <h1>Stealer Management Panel</h1>
+                    <div class="subtitle">Windows Stealer Dashboard - Educational Purpose Only</div>
+                </div>
+            </div>
+            <div class="controls">
+                <select class="language-selector" id="languageSelector">
+                    <option value="en">🇺🇸 English</option>
+                    <option value="es">🇪🇸 Spanish</option>
+                    <option value="fr">🇫🇷 French</option>
+                    <option value="de">🇩🇪 German</option>
+                    <option value="ru">🇷🇺 Russian</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">Total Victims</div>
+                <div class="stat-value" id="totalVictims">0</div>
+                <i class="fas fa-users stat-icon"></i>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Passwords Harvested</div>
+                <div class="stat-value" id="totalPasswords">0</div>
+                <i class="fas fa-key stat-icon"></i>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Cookies Collected</div>
+                <div class="stat-value" id="totalCookies">0</div>
+                <i class="fas fa-cookie-bite stat-icon"></i>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Social Accounts Detected</div>
+                <div class="stat-value" id="totalSocial">0</div>
+                <i class="fas fa-hashtag stat-icon"></i>
+            </div>
+        </div>
+
+        <!-- Victims Section -->
+        <div class="victims-section">
+            <div class="section-header">
+                <h2 class="section-title">Victim Overview</h2>
+                <div class="filters">
+                    <input type="text" class="filter-input" placeholder="Search victims..." id="searchInput">
+                    <select class="filter-input" id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="online">Online</option>
+                        <option value="offline">Offline</option>
+                    </select>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>IP Address</th>
+                        <th>OS</th>
+                        <th>Passwords</th>
+                        <th>Cookies</th>
+                        <th>Social Media</th>
+                        <th>Last Seen</th>
+                    </tr>
+                </thead>
+                <tbody id="victimsTableBody">
+                    <!-- Dynamic content will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Translation object
+        const translations = {
+            en: {
+                totalVictims: "Total Victims",
+                passwordsHarvested: "Passwords Harvested",
+                cookiesCollected: "Cookies Collected",
+                socialAccountsDetected: "Social Accounts Detected",
+                victimOverview: "Victim Overview",
+                searchVictims: "Search victims...",
+                allStatus: "All Status",
+                online: "Online",
+                offline: "Offline",
+                facebookAccount: "Facebook account detected",
+                instagramAccount: "Instagram account detected",
+                twitterAccount: "Twitter account detected",
+                tiktokAccount: "TikTok account detected",
+                snapchatAccount: "Snapchat account detected",
+                redditAccount: "Reddit account detected",
+                linkedinAccount: "LinkedIn account detected",
+                pinterestAccount: "Pinterest account detected",
+                discordAccount: "Discord account detected",
+                twitchAccount: "Twitch account detected"
+            },
+            es: {
+                totalVictims: "Víctimas Totales",
+                passwordsHarvested: "Contraseñas Recopiladas",
+                cookiesCollected: "Cookies Recogidas",
+                socialAccountsDetected: "Cuentas Sociales Detectadas",
+                victimOverview: "Resumen de Víctimas",
+                searchVictims: "Buscar víctimas...",
+                allStatus: "Todo el Estado",
+                online: "En línea",
+                offline: "Fuera de línea",
+                facebookAccount: "Cuenta de Facebook detectada",
+                instagramAccount: "Cuenta de Instagram detectada",
+                twitterAccount: "Cuenta de Twitter detectada",
+                tiktokAccount: "Cuenta de TikTok detectada",
+                snapchatAccount: "Cuenta de Snapchat detectada",
+                redditAccount: "Cuenta de Reddit detectada",
+                linkedinAccount: "Cuenta de LinkedIn detectada",
+                pinterestAccount: "Cuenta de Pinterest detectada",
+                discordAccount: "Cuenta de Discord detectada",
+                twitchAccount: "Cuenta de Twitch detectada"
+            },
+            fr: {
+                totalVictims: "Victimes Totales",
+                passwordsHarvested: "Mots de Passe Récupérés",
+                cookiesCollected: "Cookies Collectées",
+                socialAccountsDetected: "Comptes Sociaux Détectés",
+                victimOverview: "Vue d'Ensemble des Victimes",
+                searchVictims: "Rechercher des victimes...",
+                allStatus: "Tout Statut",
+                online: "En ligne",
+                offline: "Hors ligne",
+                facebookAccount: "Compte Facebook détecté",
+                instagramAccount: "Compte Instagram détecté",
+                twitterAccount: "Compte Twitter détecté",
+                tiktokAccount: "Compte TikTok détecté",
+                snapchatAccount: "Compte Snapchat détecté",
+                redditAccount: "Compte Reddit détecté",
+                linkedinAccount: "Compte LinkedIn détecté",
+                pinterestAccount: "Compte Pinterest détecté",
+                discordAccount: "Compte Discord détecté",
+                twitchAccount: "Compte Twitch détecté"
+            },
+            de: {
+                totalVictims: "Gesamte Opfer",
+                passwordsHarvested: "Geharvestete Passwörter",
+                cookiesCollected: "Gesammelte Cookies",
+                socialAccountsDetected: "Soziale Konten Erkannt",
+                victimOverview: "Opferübersicht",
+                searchVictims: "Opfer suchen...",
+                allStatus: "Alle Status",
+                online: "Online",
+                offline: "Offline",
+                facebookAccount: "Facebook-Konto erkannt",
+                instagramAccount: "Instagram-Konto erkannt",
+                twitterAccount: "Twitter-Konto erkannt",
+                tiktokAccount: "TikTok-Konto erkannt",
+                snapchatAccount: "Snapchat-Konto erkannt",
+                redditAccount: "Reddit-Konto erkannt",
+                linkedinAccount: "LinkedIn-Konto erkannt",
+                pinterestAccount: "Pinterest-Konto erkannt",
+                discordAccount: "Discord-Konto erkannt",
+                twitchAccount: "Twitch-Konto erkannt"
+            },
+            ru: {
+                totalVictims: "Всего Жертв",
+                passwordsHarvested: "Получено Паролей",
+                cookiesCollected: "Собрано Cookie",
+                socialAccountsDetected: "Обнаружено Соц. Аккаунтов",
+                victimOverview: "Обзор Жертв",
+                searchVictims: "Поиск жертв...",
+                allStatus: "Все Статусы",
+                online: "Онлайн",
+                offline: "Офлайн",
+                facebookAccount: "Обнаружен аккаунт Facebook",
+                instagramAccount: "Обнаружен аккаунт Instagram",
+                twitterAccount: "Обнаружен аккаунт Twitter",
+                tiktokAccount: "Обнаружен аккаунт TikTok",
+                snapchatAccount: "Обнаружен аккаунт Snapchat",
+                redditAccount: "Обнаружен аккаунт Reddit",
+                linkedinAccount: "Обнаружен аккаунт LinkedIn",
+                pinterestAccount: "Обнаружен аккаунт Pinterest",
+                discordAccount: "Обнаружен аккаунт Discord",
+                twitchAccount: "Обнаружен аккаунт Twitch"
+            }
+        };
+
+        // Social media platforms with icons and tooltips
+        const socialPlatforms = [
+            { name: 'facebook', icon: 'fab fa-facebook', tooltip: 'facebookAccount' },
+            { name: 'instagram', icon: 'fab fa-instagram', tooltip: 'instagramAccount' },
+            { name: 'twitter', icon: 'fab fa-twitter', tooltip: 'twitterAccount' },
+            { name: 'tiktok', icon: 'fab fa-tiktok', tooltip: 'tiktokAccount' },
+            { name: 'snapchat', icon: 'fab fa-snapchat', tooltip: 'snapchatAccount' },
+            { name: 'reddit', icon: 'fab fa-reddit', tooltip: 'redditAccount' },
+            { name: 'linkedin', icon: 'fab fa-linkedin', tooltip: 'linkedinAccount' },
+            { name: 'pinterest', icon: 'fab fa-pinterest', tooltip: 'pinterestAccount' },
+            { name: 'discord', icon: 'fab fa-discord', tooltip: 'discordAccount' },
+            { name: 'twitch', icon: 'fab fa-twitch', tooltip: 'twitchAccount' }
+        ];
+
+        // Mock data for victims
+        const mockVictims = [
+            {
+                id: 'WIN-PC-001',
+                ip: '192.168.1.101',
+                country: 'us',
+                os: 'Windows 10 Pro',
+                passwords: 24,
+                cookies: 156,
+                socialMedia: ['facebook', 'instagram', 'twitter'],
+                lastSeen: '2 minutes ago',
+                status: 'online'
+            },
+            {
+                id: 'DESKTOP-GAMER',
+                ip: '203.0.113.45',
+                country: 'de',
+                os: 'Windows 11 Home',
+                passwords: 18,
+                cookies: 89,
+                socialMedia: ['facebook', 'tiktok', 'discord'],
+                lastSeen: '5 minutes ago',
+                status: 'online'
+            },
+            {
+                id: 'LAPTOP-OFFICE',
+                ip: '198.51.100.23',
+                country: 'fr',
+                os: 'Windows Server 2019',
+                passwords: 42,
+                cookies: 203,
+                socialMedia: ['facebook', 'linkedin', 'twitter', 'instagram'],
+                lastSeen: '1 hour ago',
+                status: 'offline'
+            },
+            {
+                id: 'HOME-PC-USER',
+                ip: '203.0.113.78',
+                country: 'gb',
+                os: 'Windows 10 Home',
+                passwords: 15,
+                cookies: 67,
+                socialMedia: ['facebook', 'reddit', 'tiktok'],
+                lastSeen: '3 hours ago',
+                status: 'offline'
+            },
+            {
+                id: 'GAME-STATION',
+                ip: '192.0.2.56',
+                country: 'ca',
+                os: 'Windows 11 Pro',
+                passwords: 31,
+                cookies: 142,
+                socialMedia: ['discord', 'twitch', 'twitter'],
+                lastSeen: '30 minutes ago',
+                status: 'online'
+            },
+            {
+                id: 'WORK-LAPTOP',
+                ip: '198.51.100.89',
+                country: 'jp',
+                os: 'Windows 10 Enterprise',
+                passwords: 56,
+                cookies: 289,
+                socialMedia: ['facebook', 'linkedin', 'twitter', 'instagram', 'pinterest'],
+                lastSeen: '45 minutes ago',
+                status: 'online'
+            },
+            {
+                id: 'STUDENT-PC',
+                ip: '203.0.113.12',
+                country: 'au',
+                os: 'Windows 11 Home',
+                passwords: 9,
+                cookies: 43,
+                socialMedia: ['instagram', 'tiktok', 'snapchat'],
+                lastSeen: '2 hours ago',
+                status: 'offline'
+            },
+            {
+                id: 'OLD-DESKTOP',
+                ip: '192.168.1.205',
+                country: 'br',
+                os: 'Windows 7 Ultimate',
+                passwords: 7,
+                cookies: 21,
+                socialMedia: ['facebook', 'twitter'],
+                lastSeen: '1 day ago',
+                status: 'offline'
+            }
+        ];
+
+        // Current language
+        let currentLanguage = 'en';
+
+        // Update UI with translations
+        function updateTranslations() {
+            const t = translations[currentLanguage];
+            
+            document.querySelector('.section-title').textContent = t.victimOverview;
+            document.getElementById('searchInput').placeholder = t.searchVictims;
+            document.querySelector('#statusFilter option[value=""]').textContent = t.allStatus;
+            document.querySelector('#statusFilter option[value="online"]').textContent = t.online;
+            document.querySelector('#statusFilter option[value="offline"]').textContent = t.offline;
+            
+            // Update stat card titles
+            document.querySelectorAll('.stat-title')[0].textContent = t.totalVictims;
+            document.querySelectorAll('.stat-title')[1].textContent = t.passwordsHarvested;
+            document.querySelectorAll('.stat-title')[2].textContent = t.cookiesCollected;
+            document.querySelectorAll('.stat-title')[3].textContent = t.socialAccountsDetected;
+        }
+
+        // Calculate statistics
+        function calculateStats() {
+            const totalVictims = mockVictims.length;
+            const totalPasswords = mockVictims.reduce((sum, victim) => sum + victim.passwords, 0);
+            const totalCookies = mockVictims.reduce((sum, victim) => sum + victim.cookies, 0);
+            const totalSocial = mockVictims.reduce((sum, victim) => sum + victim.socialMedia.length, 0);
+
+            document.getElementById('totalVictims').textContent = totalVictims;
+            document.getElementById('totalPasswords').textContent = totalPasswords.toLocaleString();
+            document.getElementById('totalCookies').textContent = totalCookies.toLocaleString();
+            document.getElementById('totalSocial').textContent = totalSocial;
+        }
+
+        // Render victims table
+        function renderVictimsTable(victimsToRender = mockVictims) {
+            const tbody = document.getElementById('victimsTableBody');
+            tbody.innerHTML = '';
+
+            victimsToRender.forEach(victim => {
+                const tr = document.createElement('tr');
+                
+                // Get social media icons with tooltips
+                const socialIconsHtml = victim.socialMedia.map(platform => {
+                    const platformInfo = socialPlatforms.find(p => p.name === platform);
+                    if (platformInfo) {
+                        const tooltipText = translations[currentLanguage][platformInfo.tooltip];
+                        return `
+                            <div class="tooltip">
+                                <div class="social-icon">
+                                    <i class="${platformInfo.icon}"></i>
+                                </div>
+                                <span class="tooltiptext">${tooltipText}</span>
+                            </div>
+                        `;
+                    }
+                    return '';
+                }).join('');
+
+                tr.innerHTML = `
+                    <td>
+                        <div class="victim-id">
+                            <i class="fab fa-windows windows-icon"></i>
+                            ${victim.id}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="ip-location">
+                            <span class="fi fi-${victim.country}"></span>
+                            ${victim.ip}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="os-info">
+                            <i class="fab fa-windows os-icon"></i>
+                            ${victim.os}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge badge-passwords">${victim.passwords}</span>
+                    </td>
+                    <td>
+                        <span class="badge badge-cookies">${victim.cookies}</span>
+                    </td>
+                    <td>
+                        <div class="social-icons">
+                            ${socialIconsHtml}
+                        </div>
+                    </td>
+                    <td class="last-seen">${victim.lastSeen}</td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Filter victims based on search and status
+        function filterVictims() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            let filtered = mockVictims.filter(victim => {
+                const matchesSearch = victim.id.toLowerCase().includes(searchTerm) || 
+                                     victim.ip.includes(searchTerm) ||
+                                     victim.os.toLowerCase().includes(searchTerm);
+                
+                const matchesStatus = !statusFilter || victim.status === statusFilter;
+                
+                return matchesSearch && matchesStatus;
+            });
+
+            renderVictimsTable(filtered);
+        }
+
+        // Initialize the application
+        function init() {
+            // Set up event listeners
+            document.getElementById('languageSelector').addEventListener('change', function() {
+                currentLanguage = this.value;
+                updateTranslations();
+                renderVictimsTable(); // Re-render to update tooltips
+            });
+
+            document.getElementById('searchInput').addEventListener('input', filterVictims);
+            document.getElementById('statusFilter').addEventListener('change', filterVictims);
+
+            // Initial setup
+            updateTranslations();
+            calculateStats();
+            renderVictimsTable();
+        }
+
+        // Run initialization when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
